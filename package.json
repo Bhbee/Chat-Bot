@@ -1,0 +1,22 @@
+{
+  "name": "chat-bot",
+  "version": "1.0.0",
+  "description": "A restaurant order chat bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon run server.js"
+  },
+  "author": "Bhbee",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "moment": "^2.29.4",
+    "socket.io": "^4.6.1",
+    "ws": "^8.13.0"
+  }
+}
