@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
                         session.currentOrder.push(selectedItem);
                         allSelectedMenu.push(session.currentOrder);
                         setTimeout( ()=> {
-                            socket.emit("message", formatMessage(botName,`${selectedItem} has been added to your order history. <br> press  <br> 98. To see your order <br> 99. To checkout/place your order.`));
+                            socket.emit("message", formatMessage(botName,`${selectedItem} has been added to your order history. <br> press <br> 97. To see your current order list <br> 98. To see your order history <br> 99. To checkout/place your order.`));
                         }, 1000)
                         } 
                     else{
