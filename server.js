@@ -20,7 +20,7 @@ const junks = {
     5: "Burger",
     6: "Sandwich"
 };
-const orderHistory = [];
+//const orderHistory = [];
 let allSelectedMenu = [];
 
 const sessionMiddleware = session({
@@ -44,10 +44,11 @@ io.on("connection", (socket) => {
 
     let userName = "";
     socket.session = socket.request.session;
+    let orderHistory = [];
     socket.emit("message", formatMessage(botName,"Hello! What is your name?"));
     
     socket.on("userMessage", msg => {
-
+        //Welcome User after they send in their name 
         if (!userName)  {
             showUserMessage(msg)
 
@@ -59,14 +60,16 @@ io.on("connection", (socket) => {
         else{
 
             switch (msg) {
+                //if user seelects 1, show a list of junk foods they can place an order on
                 case "1":
                     showUserMessage(msg)
                     setTimeout( ()=> {
-                        const itemOptions = Object.keys(junks).map((key) => `${key}. ${junks[key]}`).join("\n");
-                        socket.emit("message", formatMessage(botName, `Here is a list of junk food you can order: <br> <br> ${itemOptions} <br> Please select your choice.`));
+                        const junkOptions = Object.keys(junks).map((key) => `${key}. ${junks[key]}`).join("\n");
+                        socket.emit("message", formatMessage(botName, `Here is a list of junk food you can order: <br> <br> ${junkOptions} <br> Please select your choice.`));
                     }, 1000)
                     break;
                 
+                //if user selects (2,3,4,5,or 6), add it to the array of current order and bot should reply that the selected item has been added to your order history
                 case "2":
                 case "3":
                 case "4":
@@ -79,9 +82,11 @@ io.on("connection", (socket) => {
                         const selectedItem = junks[selectedIndex];
                         session.currentOrder = [];
                         session.currentOrder.push(selectedItem);
-                        allSelectedMenu.push(session.currentOrder);
+                        session.currentOrder.forEach(element => {
+                            allSelectedMenu.push(element)
+                        });
                         setTimeout( ()=> {
-                            socket.emit("message", formatMessage(botName,`${selectedItem} has been added to your order history. <br> press <br> 97. To see your current order list <br> 98. To see your order history <br> 99. To checkout/place your order.`));
+                            socket.emit("message", formatMessage(botName,`${selectedItem} has been added to your order list. <br> press <br> 97. To see your current list order to be placed  <br> 98. To see your order history <br> 99. To checkout/place your order.`));
                         }, 1000)
                         } 
                     else{
@@ -93,6 +98,7 @@ io.on("connection", (socket) => {
     
     
                 case "97":
+                    //When selected, show all current order to be placed 
                     showUserMessage(msg)
 
                     if (allSelectedMenu.length === 0) {
@@ -105,15 +111,16 @@ io.on("connection", (socket) => {
                         const currentOrder = allSelectedMenu.join(", ");
                         setTimeout( ()=> {
                             socket.emit("message", formatMessage(botName,
-                            `Here is your current order:\n ${currentOrder}`
+                            `Here is your current order:\n ${currentOrder} <br> Select <br> 99. To place order`
                             ));
                         }, 1000)
                     }
                     break;
                 
                 case "98":
+                    //Show history of all placed order for the session
                     showUserMessage(msg)
-
+                    
                     if (orderHistory.length === 0) {
                         setTimeout( ()=> { 
                             socket.emit("message", formatMessage(botName, "You don't have any order history. <br> Select <br> 1. To place an order now"));
@@ -122,7 +129,7 @@ io.on("connection", (socket) => {
                     else {
                         const myOrderHistory = orderHistory
                             .map((order, index) => `${index + 1}: ${order.join(", ")}`)
-                            .join(" \n");
+                            .join("<br>");
                             setTimeout( ()=> {
                                 socket.emit("message", formatMessage(botName, `Here is your order history: <br> ${myOrderHistory} <br><br> Select <br> 1. To place another order`));
                             }, 1000)
@@ -130,11 +137,12 @@ io.on("connection", (socket) => {
                     break;
 
                 case "99":
+                    //places an order by adding it to an array containing the list of all placed order in that session
                     showUserMessage(msg)
 
                     if (allSelectedMenu.length === 0) {
                         setTimeout( ()=> {
-                            socket.emit("message",formatMessage(botName, "No menu selected. <br> Select <br> 1. To place an order"));
+                            socket.emit("message",formatMessage(botName, "No order to place. <br> Select <br> 1. To place an order"));
                         }, 1000)
                     } 
                     else {  
@@ -146,10 +154,13 @@ io.on("connection", (socket) => {
                     break;
         
                 case "0":
+                    //Removes the last order placed from the order history array
                     showUserMessage(msg)
 
-                    if(allSelectedMenu.length > 0){
-                        allSelectedMenu = []
+                    if(orderHistory.length > 0){
+                        orderHistory.splice(-1)
+                        console.log(orderHistory)
+                        //allSelectedMenu = []
                         setTimeout( ()=> {
                             socket.emit("message", formatMessage(botName, "Order cancelled"));
                         }, 1000)
@@ -162,6 +173,7 @@ io.on("connection", (socket) => {
                     break;
     
                 default:
+                    //bot displays Invalid selection when user's inputs is invalid
                     showUserMessage(msg)
 
                     setTimeout( ()=> {
