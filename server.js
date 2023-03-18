@@ -147,7 +147,7 @@ io.on("connection", (socket) => {
                     } 
                     else {  
                         orderHistory.push(allSelectedMenu)
-                        setTimeout( ()=> {socket.emit("message", formatMessage(botName, "Order placed!  <br> Select <br> 1. To place another order <br> 98. To see order history" ));
+                        setTimeout( ()=> {socket.emit("message", formatMessage(botName, "Order placed!  <br> Select <br> 0. To cancel order <br> 1. To place another order <br> 98. To see order history" ));
                         allSelectedMenu = []
                         }, 1000)
                     }
